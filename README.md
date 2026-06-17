@@ -2,7 +2,7 @@
 
 > Started as a Java console app to learn data structures and OOP. Rebuilt as a full web analytics platform with real statistical forecasting, time-series replay, and AI coaching.
 
-**[Live Demo](https://ParthM200.github.io/Sales-Analytics-Dashboard)**
+**[Live Demo](https://parthm200.github.io/Sales-Analytics-Dashboard)**
 
 ---
 
