@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales OS — Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-hex" viewBox="0 0 24 24" fill="none"><polygon points="12,2 22,7 22,17 12,22 2,17 2,7" stroke="var(--accent)" stroke-width="1.5" fill="none"/><polygon points="12,6 18,9.5 18,16.5 12,20 6,16.5 6,9.5" fill="var(--accent)" opacity="0.15"/></svg>
+      <span class="brand-name">SALES<span class="accent">OS</span></span>
+    </div>
+    <nav class="main-nav">
+      <button class="nav-btn active" data-tab="dashboard">DASHBOARD</button>
+      <button class="nav-btn" data-tab="products">PRODUCTS</button>
+      <button class="nav-btn" data-tab="data-entry">DATA ENTRY</button>
+    </nav>
+    <div class="header-actions">
+      <button id="ai-coach-toggle" class="btn-ghost" title="Open AI Sales Coach">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M9 9h.01M15 9h.01M9 15s1 2 3 2 3-2 3-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        AI COACH
+      </button>
+      <button id="war-room-toggle" class="btn-war-room">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" stroke="currentColor" stroke-width="1.5" fill="currentColor" opacity="0.2"/></svg>
+        WAR ROOM
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════ APP BODY -->
+  <div class="app-body">
+
+    <!-- ─────────────────────────── DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content active">
+
+      <!-- KPI Strip -->
+      <section class="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-label">TOTAL REVENUE</div>
+          <div class="kpi-value" id="kpi-revenue-val">—</div>
+          <div class="kpi-sub" id="kpi-revenue-sub">this period</div>
+        </div>
+        <div class="kpi-card kpi-card--accent">
+          <div class="kpi-label">TOP PERFORMER</div>
+          <div class="kpi-value" id="kpi-top-val">—</div>
+          <div class="kpi-sub" id="kpi-top-sub">— in sales</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">GOAL ATTAINMENT</div>
+          <div class="kpi-value" id="kpi-attainment-val">—</div>
+          <div class="kpi-bar-wrap"><div class="kpi-bar-fill" id="kpi-attainment-bar"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">AVG CLOSE RATE</div>
+          <div class="kpi-value" id="kpi-closerate-val">—</div>
+          <div class="kpi-sub" id="kpi-closerate-sub">vs prior 7d</div>
+        </div>
+      </section>
+
+      <!-- Main Grid -->
+      <div class="dashboard-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-main">
+
+          <section class="panel" id="leaderboard-panel">
+            <div class="panel-header">
+              <span class="panel-title">TEAM LEADERBOARD</span>
+              <span class="panel-tag" id="leaderboard-date">ALL TIME</span>
+            </div>
+            <div id="leaderboard-list" class="leaderboard-list"></div>
+          </section>
+
+          <section class="panel" id="trend-panel">
+            <div class="panel-header">
+              <span class="panel-title">SALES TREND</span>
+              <div class="chart-controls">
+                <button class="chart-btn active" data-range="7">7D</button>
+                <button class="chart-btn" data-range="14">14D</button>
+                <button class="chart-btn" data-range="30">30D</button>
+                <button class="chart-btn forecast-toggle active" data-forecast="true">FORECAST ↗</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="trend-chart"></canvas>
+            </div>
+          </section>
+
+          <section class="panel" id="product-bar-panel">
+            <div class="panel-header">
+              <span class="panel-title">REVENUE BY PRODUCT</span>
+            </div>
+            <div class="chart-wrap chart-wrap--short">
+              <canvas id="product-bar-chart"></canvas>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-side">
+
+          <section class="panel">
+            <div class="panel-header">
+              <span class="panel-title">PRODUCT MIX</span>
+            </div>
+            <div class="donut-wrap">
+              <canvas id="product-donut-chart"></canvas>
+              <div class="donut-center">
+                <div class="donut-center-val" id="donut-center-val">—</div>
+                <div class="donut-center-label">products</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <span class="panel-title">LIVE INSIGHTS</span>
+              <span class="pulse-dot"></span>
+            </div>
+            <div id="insights-list" class="insights-list"></div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────── PRODUCTS TAB -->
+    <div id="tab-products" class="tab-content">
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">PRODUCT DATABASE</span>
+        </div>
+        <div id="product-table"></div>
+      </section>
+    </div>
+
+    <!-- ─────────────────────────── DATA ENTRY TAB -->
+    <div id="tab-data-entry" class="tab-content">
+      <div class="entry-grid">
+
+        <section class="panel">
+          <div class="panel-header"><span class="panel-title">LOG A SALE</span></div>
+          <form id="log-sale-form" class="entry-form">
+            <div class="form-group">
+              <label>SALESPERSON</label>
+              <select id="sale-person" class="form-ctrl"></select>
+            </div>
+            <div class="form-group">
+              <label>PRODUCT</label>
+              <select id="sale-product" class="form-ctrl"></select>
+            </div>
+            <div class="form-group">
+              <label>AMOUNT ($)</label>
+              <input type="number" id="sale-amount" class="form-ctrl" placeholder="0.00" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label>DATE</label>
+              <input type="date" id="sale-date" class="form-ctrl">
+            </div>
+            <button type="submit" class="btn-submit">LOG SALE</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><span class="panel-title">ADD SALESPERSON</span></div>
+          <form id="add-person-form" class="entry-form">
+            <div class="form-group">
+              <label>FULL NAME</label>
+              <input type="text" id="person-name" class="form-ctrl" placeholder="First Last">
+            </div>
+            <div class="form-group">
+              <label>DAILY GOAL ($)</label>
+              <input type="number" id="person-goal" class="form-ctrl" placeholder="5000" min="0">
+            </div>
+            <button type="submit" class="btn-submit">ADD TO TEAM</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><span class="panel-title">ADD PRODUCT</span></div>
+          <form id="add-product-form" class="entry-form">
+            <div class="form-group">
+              <label>PRODUCT NAME</label>
+              <input type="text" id="product-name" class="form-ctrl" placeholder="Product Name">
+            </div>
+            <div class="form-group">
+              <label>UNIT PRICE ($)</label>
+              <input type="number" id="product-price" class="form-ctrl" placeholder="999" min="0">
+            </div>
+            <div class="form-group">
+              <label>STOCK</label>
+              <input type="number" id="product-stock" class="form-ctrl" placeholder="100" min="0">
+            </div>
+            <button type="submit" class="btn-submit">ADD PRODUCT</button>
+          </form>
+        </section>
+
+      </div>
+
+      <section class="panel" style="margin-top:16px">
+        <div class="panel-header"><span class="panel-title">TEAM MONTHLY GOAL</span></div>
+        <form id="team-goal-form" class="entry-form entry-form--row">
+          <div class="form-group" style="flex:1">
+            <label>MONTHLY TARGET ($)</label>
+            <input type="number" id="team-goal-input" class="form-ctrl" placeholder="175000" min="0">
+          </div>
+          <button type="submit" class="btn-submit" style="align-self:flex-end">UPDATE</button>
+        </form>
+      </section>
+    </div>
+
+  </div><!-- /.app-body -->
+
+  <!-- ═══════════════════════════════════════════ AI COACH PANEL -->
+  <aside id="ai-coach-panel" class="ai-coach-panel">
+    <div class="ai-coach-hdr">
+      <div class="ai-coach-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="1.5"/><path d="M9 9h.01M15 9h.01M9 15s1 2 3 2 3-2 3-2" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        AI COACH
+      </div>
+      <button id="ai-coach-close" class="btn-icon-close">✕</button>
+    </div>
+    <div id="ai-coach-messages" class="ai-msgs">
+      <div class="ai-msg ai-msg--coach">
+        <div class="ai-avatar">⬡</div>
+        <div class="ai-bubble">Ask me anything about your team. I have full context of all your sales data — try one of the starters below.</div>
+      </div>
+      <div class="ai-suggestions">
+        <button class="ai-suggestion" data-q="Who is the top performer this week and why?">Who's top this week?</button>
+        <button class="ai-suggestion" data-q="Who is underperforming and what should they focus on?">Who needs help?</button>
+        <button class="ai-suggestion" data-q="At current pace, will we hit our monthly goal?">Will we hit goal?</button>
+        <button class="ai-suggestion" data-q="Which product should we push hardest this week?">Best product to push?</button>
+      </div>
+    </div>
+    <div class="ai-input-row">
+      <input type="text" id="ai-coach-input" class="ai-input" placeholder="Ask the coach...">
+      <button id="ai-coach-send" class="ai-send-btn">↵</button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════ WAR ROOM OVERLAY -->
+  <div id="war-room-overlay" class="war-room hidden">
+    <button id="war-room-exit" class="wr-exit-btn">✕ EXIT</button>
+
+    <div class="wr-top">
+      <div class="wr-brand">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none"><polygon points="12,2 22,7 22,17 12,22 2,17 2,7" stroke="var(--accent)" stroke-width="1.5" fill="var(--accent)" opacity="0.15"/></svg>
+        WAR ROOM
+      </div>
+      <div class="wr-stats">
+        <div class="wr-stat">
+          <div class="wr-stat-lbl">TOTAL REVENUE</div>
+          <div class="wr-stat-val" id="wr-total-revenue">$0</div>
+        </div>
+        <div class="wr-stat wr-stat--hi">
+          <div class="wr-stat-lbl">GOAL ATTAINMENT</div>
+          <div class="wr-stat-val" id="wr-attainment">0%</div>
+        </div>
+        <div class="wr-stat">
+          <div class="wr-stat-lbl">DAYS REMAINING</div>
+          <div class="wr-stat-val" id="wr-days-remaining">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="wr-leaderboard" class="wr-lb"></div>
+
+    <div class="wr-footer">
+      <div class="wr-countdown-lbl">CLOSE OF MONTH IN</div>
+      <div id="wr-countdown-timer" class="wr-countdown">00d 00:00:00</div>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ TIME MACHINE BAR -->
+  <div id="time-machine-bar" class="tm-bar">
+    <div class="tm-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="1.5"/><polyline points="12,7 12,12 15,15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      TIME MACHINE
+    </div>
+    <div class="tm-btns">
+      <button id="tm-rewind" class="tm-btn" title="Jump to start">⏮</button>
+      <button id="tm-play"   class="tm-btn" title="Play / Pause">▶</button>
+      <button id="tm-forward" class="tm-btn" title="Jump to end">⏭</button>
+    </div>
+    <div class="tm-timeline">
+      <span class="tm-edge" id="tm-date-start">—</span>
+      <input type="range" id="tm-scrubber" class="tm-scrubber" min="0" max="100" value="100">
+      <span class="tm-edge" id="tm-date-end">—</span>
+    </div>
+    <div id="tm-current-display" class="tm-current tm-live">LIVE</div>
+    <button id="tm-reset" class="tm-live-btn">● LIVE</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ TOASTS -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ═══════════════════════════════════════════ SCRIPTS -->
+  <script>window.CLAUDE_API_KEY = '';</script><!-- replaced by config.js if present -->
+  <script src="js/config.js" onerror="void 0"></script>
+  <script src="js/data.js"></script>
+  <script src="js/forecast.js"></script>
+  <script src="js/insights.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/timemachine.js"></script>
+  <script src="js/warroom.js"></script>
+  <script src="js/ai-coach.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
