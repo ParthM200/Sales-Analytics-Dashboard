@@ -146,7 +146,7 @@ You are an expert sales coach with deep knowledge of sales performance analytics
           'Content-Type':            'application/json',
           'x-api-key':               key,
           'anthropic-version':       '2023-06-01',
-          'anthropic-dangerous-request-proxy': 'true',
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model:      MODEL,
