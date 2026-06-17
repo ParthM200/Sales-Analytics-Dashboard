@@ -19,7 +19,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Inject API key
-        run: echo "window.CLAUDE_API_KEY='${{ secrets.ANTHROPIC_API_KEY }}';" > js/config.js
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: printf 'window.CLAUDE_API_KEY="%s";' "$ANTHROPIC_API_KEY" > js/config.js
+
+      - name: Verify config was written
+        run: test -s js/config.js && echo "config.js written ($(wc -c < js/config.js) bytes)" || echo "WARNING: config.js is empty"
 
       - uses: actions/configure-pages@v4
 
